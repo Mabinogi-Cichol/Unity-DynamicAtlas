@@ -1,0 +1,19 @@
+{
+    "name": "DynamicAtlas.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d97f3518bfd0d6f4a9e7ac332d03648b",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

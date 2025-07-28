@@ -1,0 +1,16 @@
+{
+    "name": "DynamicAtlas.Demo",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d97f3518bfd0d6f4a9e7ac332d03648b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,22 @@
+{
+  "name": "cichol.dynamicatlas",
+  "version": "1.0.0",
+  "displayName": "DynamicAtlas",
+  "description": "A dynamic atlas solution for Unity.",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Mabinogi-Cichol/Unity-DynamicAtlas.git"
+  },
+  "unity": "2022.3",
+  "documentationUrl": "https://github.com/Mabinogi-Cichol/Unity-DynamicAtlas/blob/main/README.md",
+  "dependencies": {
+    "com.unity.ugui": "1.0.0"
+  },
+  "keywords": [
+    "UGUI"
+  ],
+  "author": {
+    "name": "Cichol",
+    "email": "wqj7894@live.com"
+  }
+}
