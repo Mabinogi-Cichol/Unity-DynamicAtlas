@@ -18,5 +18,12 @@
   "author": {
     "name": "Mabinogi-Cichol",
     "email": "wqj7894@live.com"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Demo",
+      "description": "How to use DynamicAtlas demo",
+      "path": "Samples~/Demo"
+    }
+  ]
 }
