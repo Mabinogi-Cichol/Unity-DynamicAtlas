@@ -1,6 +1,8 @@
-[English README](./README.en.md)
+[English README](./README.md)
 
 # Unity-DynamicAtlas
+
+![](Image~/LOGO.png)
 
 Unity动态图集解决方案
 
@@ -27,9 +29,3 @@ Unity动态图集解决方案
 - 散图和图集的纹理压缩格式必须一致
 
 - 散图不能为静态图集成员
-
-
-
-
-
-

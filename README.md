@@ -1,6 +1,8 @@
-[中文版 README](./README.md)
+[中文版 README](./README.cn.md)
 
 # Unity-DynamicAtlas
+
+![](Image~/LOGO.png)
 
 A dynamic atlas solution for Unity.
 
