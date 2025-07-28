@@ -29,31 +29,6 @@ namespace DynamicAtlas
             Rect.height = height;
         }
 
-        public Color32[] GetPixels32(Color32[] allPixels, int textureWidth, int textureHeight)
-        {
-            if (Sprite == null)
-            {
-                Debug.LogError("DynamicTextureData: Sprite is null");
-                return null;
-            }
-            if (Rect.x < 0 || Rect.y < 0 || Rect.width <= 0 || Rect.height <= 0 ||
-            Rect.x + Rect.width > textureWidth || Rect.y + Rect.height > textureHeight)
-            {
-                Debug.LogError("区域参数超出纹理范围！");
-                return null;
-            }
-            Color32[] regionPixels = new Color32[Rect.width * Rect.height];
-
-            for (int row = 0; row < Rect.height; row++)
-            {
-                int sourceIndex = (Rect.y + row) * textureWidth + Rect.x;
-                int targetIndex = row * Rect.width;
-                System.Array.Copy(allPixels, sourceIndex, regionPixels, targetIndex, Rect.width);
-            }
-
-            return regionPixels;
-        }
-
         public void AddReference()
         {
             ReferenceCount++;

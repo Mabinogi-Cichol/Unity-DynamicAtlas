@@ -14,13 +14,25 @@ public class Init : MonoBehaviour
             ATLAS_SIZE = 4096,
             SINGLE_TEXTURE_MAX_SIZE = 512,
             LoadSpriteFunc = LoadSpriteAsync,
-            AtlasAppendDone = OnAtlasAppendDone
+            AtlasAppendDone = OnAtlasAppendDone,
+// You can set the texture format here according to the platform used in your project
+#if UNITY_STANDALONE
+            AtlasFormat = TextureFormat.BC7,
+#elif UNITY_ANDROID
+            AtlasFormat = TextureFormat.ASTC_4x4,
+#elif UNITY_IOS
+            AtlasFormat = TextureFormat.ASTC_4x4,
+#elif UNITY_PS5
+            AtlasFormat = TextureFormat.DXT5,
+#else
+            AtlasFormat = TextureFormat.RGBA32,
+#endif
         });
     }
 
     private async Task<Sprite> LoadSpriteAsync(string sprite)
     {
-        //此处可以替换成自己的资源框架加载逻辑
+        // You can replace this with your own resource loading logic
         var req = Resources.LoadAsync(sprite);
         while (!req.isDone)
         {
@@ -31,7 +43,7 @@ public class Init : MonoBehaviour
 
     private void OnAtlasAppendDone(string sprite, DynamicAtlasManager.eLoadResult result)
     {
-        //根据自己的资源加载框架，处理散图的引用释放等逻辑
+        // Handle the logic of releasing references to individual textures according to your own resource loading framework
     }
 
 }

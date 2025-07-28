@@ -19,6 +19,7 @@ namespace DynamicAtlas
             public int ATLAS_SIZE;
             public int SINGLE_TEXTURE_MAX_SIZE;
             public int PADDING;
+            public TextureFormat AtlasFormat;
             public Func<string, Task<Sprite>> LoadSpriteFunc;
             public Action<string, eLoadResult> AtlasAppendDone;
         }
@@ -40,6 +41,7 @@ namespace DynamicAtlas
         public static int ATLAS_SIZE { get; private set; } = 2048;
         public static int SINGLE_TEXTURE_MAX_SIZE { get; private set; } = 512;
         public static int PADDING { get; private set; } = 2;
+        public static TextureFormat AtlasFormat { get; private set; } = TextureFormat.RGBA32;
         public static Func<string, Task<Sprite>> LoadSpriteFunc { get; private set; }
         public static Action<string, eLoadResult> AppendAtlasDone { get; private set; }
         private List<DynamicAtlas> mDynamicAtlases = new List<DynamicAtlas>();
@@ -49,6 +51,7 @@ namespace DynamicAtlas
             ATLAS_SIZE = setting.ATLAS_SIZE;
             SINGLE_TEXTURE_MAX_SIZE = setting.SINGLE_TEXTURE_MAX_SIZE;
             PADDING = setting.PADDING;
+            AtlasFormat = setting.AtlasFormat;
             LoadSpriteFunc = setting.LoadSpriteFunc;
             AppendAtlasDone = setting.AtlasAppendDone;
         }

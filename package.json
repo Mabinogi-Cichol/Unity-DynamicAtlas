@@ -1,5 +1,5 @@
 {
-  "name": "cichol.dynamicatlas",
+  "name": "com.mabinogi-cichol.dynamicatlas",
   "version": "1.0.0",
   "displayName": "DynamicAtlas",
   "description": "A dynamic atlas solution for Unity.",
@@ -16,7 +16,7 @@
     "UGUI"
   ],
   "author": {
-    "name": "Cichol",
+    "name": "Mabinogi-Cichol",
     "email": "wqj7894@live.com"
   }
 }
