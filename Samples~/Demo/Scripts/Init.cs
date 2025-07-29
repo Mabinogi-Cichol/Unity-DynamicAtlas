@@ -33,7 +33,7 @@ public class Init : MonoBehaviour
     private async Task<Sprite> LoadSpriteAsync(string sprite)
     {
         // You can replace this with your own resource loading logic
-        var req = Resources.LoadAsync(sprite);
+        var req = Resources.LoadAsync<Sprite>(sprite);
         while (!req.isDone)
         {
             await Task.Yield();
