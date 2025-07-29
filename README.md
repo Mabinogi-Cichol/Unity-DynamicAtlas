@@ -23,3 +23,15 @@ The rectangle packing algorithm is based on [GitHub - villekoskelaorg/RectangleP
 - OpenGL ES2.0 is not supported
 - The texture compression format of loose textures and atlases must be consistent
 - Loose textures cannot be static atlas members 
+
+## Usage Example
+
+You can quickly get a reference from the `Init.cs` script in the Demo scene.
+
+1. Call the initialization method DynamicAtlasManager.Init in your external code to initialize various parameters required for the dynamic atlas. It is recommended to call it in your initialization logic, such as Awake().
+
+2. Use the `DynamicImage` component instead of the `UnityEngine.UI.Image` component. You can directly mount images statically, or dynamically load images through the `DynamicImage.SetDynamicSprite(string spriteName)` method.
+   
+   ![](Image~/2025-07-29-16-22-26-image.png)
+
+3. Enjoy! 
