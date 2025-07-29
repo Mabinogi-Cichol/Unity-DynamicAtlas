@@ -55,21 +55,9 @@ namespace DynamicAtlas
             mAtlas = null;
 
             var texture_size = DynamicAtlasManager.ATLAS_SIZE;
+            TextureFormat format = DynamicAtlasManager.AtlasFormat;
+
             mPacker = new RectanglePacker(texture_size, texture_size, DynamicAtlasManager.PADDING, 4);
-
-            TextureFormat format = TextureFormat.RGBA32;
-#if UNITY_STANDALONE
-            format = TextureFormat.BC7;
-#elif UNITY_ANDROID
-            format = TextureFormat.ASTC_4x4;
-#elif UNITY_IOS
-            format = TextureFormat.ASTC_4x4;
-#elif UNITY_PS5
-            format = TextureFormat.DXT5;
-#else
-            format = TextureFormat.RGBA32;
-#endif
-
             mAtlas = new Texture2D(texture_size, texture_size, format, false);
             mAtlas.Apply();
 
