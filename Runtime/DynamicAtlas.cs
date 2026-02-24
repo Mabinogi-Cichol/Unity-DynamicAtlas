@@ -110,6 +110,8 @@ namespace DynamicAtlas
             mProcessTextureIds.Add(mCurrentPackedId++);
         }
 
+        private List<TextureAsset> tempTextureAssets = new List<TextureAsset>();
+        private IntegerRectangle tempRect = new IntegerRectangle();
         private void ProcessPack()
         {
             for (int i = 0; i < mProcessTextures.Count; i++)
@@ -119,8 +121,12 @@ namespace DynamicAtlas
                 mPacker.insertRectangle(texture.width, texture.height, id);
             }
 
-            List<TextureAsset> textureAssets = new List<TextureAsset>();
-            IntegerRectangle rect = new IntegerRectangle();
+            tempTextureAssets.Clear();
+            tempRect.right = 0;
+            tempRect.width = 0;
+            tempRect.id = 0;
+            tempRect.x = 0;
+            tempRect.y = 0;
             int packedCount = mPacker.packRectangles();
             for (int i = 0; i < mProcessTextureIds.Count; i++)
             {
@@ -133,11 +139,11 @@ namespace DynamicAtlas
                     int id = mPacker.getRectangleId(j);
                     if (id != process_texture_id)
                         continue;
-                    rect = mPacker.getRectangle(j, rect);
-                    Graphics.CopyTexture(process_texture, 0, 0, 0, 0, rect.width, rect.height,
-                        mAtlas, 0, 0, rect.x, rect.y);
-                    TextureAsset textureAsset = new TextureAsset(process_texture_name, process_texture_id, rect.x, rect.y, rect.width, rect.height);
-                    textureAssets.Add(textureAsset);
+                    tempRect = mPacker.getRectangle(j, tempRect);
+                    Graphics.CopyTexture(process_texture, 0, 0, 0, 0, tempRect.width, tempRect.height,
+                        mAtlas, 0, 0, tempRect.x, tempRect.y);
+                    TextureAsset textureAsset = new TextureAsset(process_texture_name, process_texture_id, tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+                    tempTextureAssets.Add(textureAsset);
                     added = true;
                     break;
                 }
@@ -146,9 +152,9 @@ namespace DynamicAtlas
                     mNeedSingleTextures.Add(process_texture_name);
                 }
             }
-            for (int i = 0; i < textureAssets.Count; i++)
+            for (int i = 0; i < tempTextureAssets.Count; i++)
             {
-                var textureAsset = textureAssets[i];
+                var textureAsset = tempTextureAssets[i];
                 var sprite = Sprite.Create(mAtlas, new Rect(textureAsset.x, textureAsset.y, textureAsset.width, textureAsset.height), Vector2.zero, 100, 0, SpriteMeshType.FullRect);
                 if (!mUsingTexture.TryGetValue(textureAsset.name, out var dynamicTextureData))
                 {
