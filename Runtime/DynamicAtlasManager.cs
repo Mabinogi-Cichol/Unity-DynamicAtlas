@@ -37,7 +37,10 @@ namespace DynamicAtlas
                 return mInstance;
             }
         }
+
+        private static bool mInitialized = false;
         private static DynamicAtlasManager mInstance;
+        public static bool Initialized { get { return mInitialized; } }
         public static int ATLAS_SIZE { get; private set; } = 2048;
         public static int SINGLE_TEXTURE_MAX_SIZE { get; private set; } = 512;
         public static int PADDING { get; private set; } = 2;
@@ -48,12 +51,14 @@ namespace DynamicAtlas
 
         public static void Init(Setting setting)
         {
+            if (mInitialized) return;
             ATLAS_SIZE = setting.ATLAS_SIZE;
             SINGLE_TEXTURE_MAX_SIZE = setting.SINGLE_TEXTURE_MAX_SIZE;
             PADDING = setting.PADDING;
             AtlasFormat = setting.AtlasFormat;
             LoadSpriteFunc = setting.LoadSpriteFunc;
             AppendAtlasDone = setting.AtlasAppendDone;
+            mInitialized = true;
         }
 
         private void LateUpdate()

@@ -33,7 +33,7 @@ namespace DynamicAtlas
         private void Init()
         {
             if (mInited) return;
-            if (Application.isPlaying)
+            if (Application.isPlaying && DynamicAtlasManager.Initialized)
             {
                 mDynamicAtlas = DynamicAtlasManager.Instance.GetDynamicAtlas();
                 SetDefaultSprite();
@@ -79,7 +79,7 @@ namespace DynamicAtlas
             }
             CrossFadeAlpha(0, 0, true);
             var start_time = Time.unscaledTime;
-            var sprite = await mDynamicAtlas.GetSpriteAsync(spriteName,  token);
+            var sprite = await mDynamicAtlas.GetSpriteAsync(spriteName, token);
             if (token.IsCancellationRequested) return;
             var end_time = Time.unscaledTime;
             CrossFadeAlpha(1, end_time - start_time > NEED_FADE_INTERVAL_TIME ? ICON_ASYNC_FADE_TIME : 0, true);
