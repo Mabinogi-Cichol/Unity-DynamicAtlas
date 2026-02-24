@@ -33,8 +33,13 @@ namespace DynamicAtlas
         private void Init()
         {
             if (mInited) return;
-            if (Application.isPlaying && DynamicAtlasManager.Initialized)
+            if (Application.isPlaying)
             {
+                if (!DynamicAtlasManager.Initialized)
+                {
+                    Debug.LogError("DynamicAtlasManager is not initialized, please call DynamicAtlasManager.Init() before using DynamicImage.");
+                    return;
+                }
                 mDynamicAtlas = DynamicAtlasManager.Instance.GetDynamicAtlas();
                 SetDefaultSprite();
                 mInited = true;
