@@ -42,16 +42,13 @@ namespace DynamicAtlas
         private List<string> mNeedSingleTextures = new List<string>();
         private bool mIsFull;
 
-        private bool mEditorLog = false;
+        private bool mEditorLog => DynamicAtlasManager.EDITOR_LOG;
         private int mCurrentPackedId;
         private bool mNeedProcessPack = false;
         public UnityEvent<string, Sprite> OnSpriteRePacked;
 
         public DynamicAtlas()
         {
-#if UNITY_EDITOR
-            mEditorLog = false;
-#endif
             mAtlas = null;
 
             var texture_size = DynamicAtlasManager.ATLAS_SIZE;
@@ -75,24 +72,32 @@ namespace DynamicAtlas
             }
         }
 
+        public bool ContainsSprite(string sprite_name)
+        {
+            if (mUsingTexture.ContainsKey(sprite_name))
+                return true;
+            else if (mProcessTextureNames.Contains(sprite_name))
+                return true;
+            return false;
+        }
+
         public bool AppendSprite(Sprite sprite)
         {
-
             var texture = sprite.texture;
             if (SystemInfo.copyTextureSupport == UnityEngine.Rendering.CopyTextureSupport.None)
             {
 
-                Debug.LogWarning($"Cuurent Graphic Device:{SystemInfo.graphicsDeviceName}, API: {SystemInfo.graphicsDeviceType} NotSupport CopyTexture ! can not add to dynamic atlas");
+                Debug.LogWarning($"[DyanamicAtlas]: Cuurent Graphic Device:{SystemInfo.graphicsDeviceName}, API: {SystemInfo.graphicsDeviceType} NotSupport CopyTexture ! can not add to dynamic atlas");
                 return false;
             }
             if (texture.format != mAtlas.format)
             {
-                Debug.LogWarning($"texture: {texture.name} format is diff ,format:{texture.format}!");
+                Debug.LogWarning($"[DyanamicAtlas]: texture: {texture.name} format is diff ,format:{texture.format}!");
                 return false;
             }
             if (sprite.rect.width > DynamicAtlasManager.SINGLE_TEXTURE_MAX_SIZE || sprite.rect.height > DynamicAtlasManager.SINGLE_TEXTURE_MAX_SIZE)
             {
-                Debug.LogWarning($"texture: {texture.name} size is outside {DynamicAtlasManager.SINGLE_TEXTURE_MAX_SIZE}, can not add to dynamic atlas");
+                Debug.LogWarning($"[DyanamicAtlas]: texture: {texture.name} size is outside {DynamicAtlasManager.SINGLE_TEXTURE_MAX_SIZE}, can not add to dynamic atlas");
                 return false;
             }
 
@@ -142,7 +147,7 @@ namespace DynamicAtlas
                     tempRect = mPacker.getRectangle(j, tempRect);
                     Graphics.CopyTexture(process_texture, 0, 0, 0, 0, tempRect.width, tempRect.height,
                         mAtlas, 0, 0, tempRect.x, tempRect.y);
-                    TextureAsset textureAsset = new TextureAsset(process_texture_name, process_texture_id, tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+                    TextureAsset textureAsset = new TextureAsset(process_texture_name, process_texture_id, tempRect.x + 1, tempRect.y + 1, tempRect.width - 2, tempRect.height - 2);
                     tempTextureAssets.Add(textureAsset);
                     added = true;
                     break;
@@ -161,13 +166,13 @@ namespace DynamicAtlas
                     dynamicTextureData = new DynamicTextureData(textureAsset.index, new IntegerRectangle(0, 0, textureAsset.width, textureAsset.height));
                     if (!mUsingTexture.TryAdd(textureAsset.name, dynamicTextureData))
                     {
-                        Debug.LogError($"UsingTexture Add Failed ! {textureAsset.name} is Added !");
+                        Debug.LogError($"[DyanamicAtlas]: UsingTexture Add Failed ! {textureAsset.name} is Added !");
                     }
                 }
                 dynamicTextureData.SetSprite(sprite, textureAsset.name, textureAsset.x, textureAsset.y, textureAsset.width, textureAsset.height);
             }
             if (mEditorLog)
-                Debug.Log($"DyanamicAtlas: ProcessPack Done, mPacker.rectangleCount: {packedCount}");
+                Debug.Log($"[DyanamicAtlas]: ProcessPack Done, mPacker.rectangleCount: {packedCount}");
 
             mProcessTextureNames.Clear();
             mProcessTextures.Clear();
@@ -180,16 +185,16 @@ namespace DynamicAtlas
             {
                 textureData.AddReference();
                 if (mEditorLog)
-                    Debug.Log($"DyanamicAtlas: {sprite_name} AddReference, now referecneCount: {textureData.ReferenceCount}");
+                    Debug.Log($"[DyanamicAtlas]: {sprite_name} AddReference, now referecneCount: {textureData.ReferenceCount}");
                 return textureData.Sprite;
             }
             if (mSingleTexture.TryGetValue(sprite_name, out var handle))
             {
                 if (mEditorLog)
-                    Debug.Log($"DyanamicAtlas: {sprite_name} Add from SingleTexture");
+                    Debug.Log($"[DyanamicAtlas]: {sprite_name} Add from SingleTexture");
                 return handle;
             }
-            Debug.LogError($"Not Found Sprite: {sprite_name} from DynamicAtlas UsingTextures!");
+            Debug.LogError($"[DyanamicAtlas]: Not Found Sprite: {sprite_name} from DynamicAtlas UsingTextures!");
             return null;
         }
 
@@ -197,7 +202,7 @@ namespace DynamicAtlas
         {
             sprite_name = Path.GetFileNameWithoutExtension(sprite_name);
             if (mEditorLog)
-                Debug.Log($"DyanamicAtlas: Get Sprite: {sprite_name}");
+                Debug.Log($"[DyanamicAtlas]: Get Sprite: {sprite_name}");
 
             if (mProcessTextureNames.Contains(sprite_name))
             {
@@ -253,22 +258,22 @@ namespace DynamicAtlas
             {
                 mSingleTexture.Remove(sprite_name);
                 if (mEditorLog)
-                    Debug.Log($"DyanamicAtlas: {sprite_name} Remove from SingleTexture");
+                    Debug.Log($"[DyanamicAtlas]: {sprite_name} Remove from SingleTexture");
             }
             if (mUsingTexture.ContainsKey(sprite_name))
             {
                 var textureData = mUsingTexture[sprite_name];
                 textureData.RemoveReference();
                 if (mEditorLog)
-                    Debug.Log($"DyanamicAtlas: {sprite_name} RemoveReference, now referecneCount: {textureData.ReferenceCount}");
+                    Debug.Log($"[DyanamicAtlas]: {sprite_name} RemoveReference, now referecneCount: {textureData.ReferenceCount}");
                 if (textureData.ReferenceCount == 0)
                 {
                     bool success = mPacker.releaseRectangle(textureData.Id);
                     if (mEditorLog)
-                        Debug.Log($"DyanamicAtlas: Release {sprite_name} mPacker.rectangleCount: {mPacker.rectangleCount}");
+                        Debug.Log($"[DyanamicAtlas]: Release {sprite_name} mPacker.rectangleCount: {mPacker.rectangleCount}");
                     if (!success)
                     {
-                        Debug.LogError($"Release {sprite_name} from atlas Failed");
+                        Debug.LogError($"[DyanamicAtlas]: Release {sprite_name} from atlas Failed");
                         return;
                     }
                     mUsingTexture.Remove(sprite_name);
