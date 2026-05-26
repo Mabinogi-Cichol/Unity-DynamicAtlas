@@ -36,10 +36,12 @@ namespace DynamicAtlas
         private List<int> mProcessTextureIds;
 
         public bool IsFull => mIsFull;
+        public List<string> OverflowTextureNames => mOverflowTextureNames;
 
         private Dictionary<string, DynamicTextureData> mUsingTexture = new Dictionary<string, DynamicTextureData>();
         private Dictionary<string, Sprite> mSingleTexture = new Dictionary<string, Sprite>();
         private List<string> mNeedSingleTextures = new List<string>();
+        private List<string> mOverflowTextureNames = new List<string>();
         private bool mIsFull;
 
         private bool mEditorLog => DynamicAtlasManager.EDITOR_LOG;
@@ -61,6 +63,7 @@ namespace DynamicAtlas
             mProcessTextureNames = new List<string>();
             mProcessTextures = new List<Texture2D>();
             mProcessTextureIds = new List<int>();
+            mOverflowTextureNames = new List<string>();
         }
 
         public void LateUpdate()
@@ -119,6 +122,7 @@ namespace DynamicAtlas
         private IntegerRectangle tempRect = new IntegerRectangle();
         private void ProcessPack()
         {
+            mOverflowTextureNames.Clear();
             for (int i = 0; i < mProcessTextures.Count; i++)
             {
                 var texture = mProcessTextures[i];
@@ -154,7 +158,7 @@ namespace DynamicAtlas
                 }
                 if (!added)
                 {
-                    mNeedSingleTextures.Add(process_texture_name);
+                    mOverflowTextureNames.Add(process_texture_name);
                 }
             }
             for (int i = 0; i < tempTextureAssets.Count; i++)
@@ -171,6 +175,11 @@ namespace DynamicAtlas
                 }
                 dynamicTextureData.SetSprite(sprite, textureAsset.name, textureAsset.x, textureAsset.y, textureAsset.width, textureAsset.height);
             }
+            if (mOverflowTextureNames.Count > 0)
+            {
+                mIsFull = true;
+            }
+
             if (mEditorLog)
                 Debug.Log($"[DyanamicAtlas]: ProcessPack Done, mPacker.rectangleCount: {packedCount}");
 
@@ -230,6 +239,10 @@ namespace DynamicAtlas
                     {
                         await Task.Yield();
                         if (token.IsCancellationRequested) return null;
+                    }
+                    if (mOverflowTextureNames.Contains(sprite_name))
+                    {
+                        return null;
                     }
                     if (mNeedSingleTextures.Contains(sprite_name))
                     {

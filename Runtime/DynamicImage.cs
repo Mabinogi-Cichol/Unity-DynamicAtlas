@@ -12,7 +12,7 @@ namespace DynamicAtlas
     {
         private static float ICON_ASYNC_FADE_TIME = 0.1f;
         private static float NEED_FADE_INTERVAL_TIME = 0.05f;
-        private DynamicAtlas mDynamicAtlas;
+        [SerializeField] private int mAtlasIndex = -1;
 
         private bool mInited;
         private CancellationTokenSource mCancellation;
@@ -40,7 +40,6 @@ namespace DynamicAtlas
                     Debug.LogError("DynamicAtlasManager is not initialized, please call DynamicAtlasManager.Init() before using DynamicImage.");
                     return;
                 }
-                mDynamicAtlas = DynamicAtlasManager.Instance.GetDynamicAtlas();
                 SetDefaultSprite();
                 mInited = true;
             }
@@ -50,7 +49,6 @@ namespace DynamicAtlas
         {
             if (sprite != null)
             {
-                mDynamicAtlas.AppendSprite(sprite);
                 if (mCancellation != null)
                 {
                     mCancellation.Cancel();
@@ -84,7 +82,7 @@ namespace DynamicAtlas
             }
             CrossFadeAlpha(0, 0, true);
             var start_time = Time.unscaledTime;
-            var sprite = await mDynamicAtlas.GetSpriteAsync(spriteName, token);
+            var sprite = await DynamicAtlasManager.Instance.GetSprite(spriteName, mAtlasIndex, token);
             if (token.IsCancellationRequested) return;
             var end_time = Time.unscaledTime;
             CrossFadeAlpha(1, end_time - start_time > NEED_FADE_INTERVAL_TIME ? ICON_ASYNC_FADE_TIME : 0, true);
@@ -103,7 +101,7 @@ namespace DynamicAtlas
             }
             if (sprite == null)
                 return;
-            mDynamicAtlas.RemoveSprite(sprite.name);
+            DynamicAtlasManager.Instance.ReleaseSprite(sprite.name);
             sprite = null;
         }
     }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -50,6 +52,7 @@ namespace DynamicAtlas
         public static Func<string, Task<Sprite>> LoadSpriteFunc { get; private set; }
         public static Action<string, eLoadResult> AppendAtlasDone { get; private set; }
         private List<DynamicAtlas> mDynamicAtlases = new List<DynamicAtlas>();
+        private Dictionary<string, DynamicAtlas> mSpriteToAtlas = new Dictionary<string, DynamicAtlas>();
 
         public static void Init(Setting setting)
         {
@@ -66,9 +69,27 @@ namespace DynamicAtlas
 
         private void LateUpdate()
         {
+            bool createdNewAtlasThisFrame = false;
             for (int i = 0; i < mDynamicAtlases.Count; i++)
             {
                 mDynamicAtlases[i].LateUpdate();
+
+                // Overflow routing: if this atlas is full and has overflow textures,
+                // ensure a new atlas exists for future allocations
+                var atlas = mDynamicAtlases[i];
+                if (atlas.IsFull)
+                {
+                    var overflowNames = atlas.OverflowTextureNames;
+                    if (overflowNames != null && overflowNames.Count > 0)
+                    {
+                        if (!createdNewAtlasThisFrame)
+                        {
+                            // Create ONE new atlas to prime the pool for next allocations
+                            GetDynamicAtlas();
+                            createdNewAtlasThisFrame = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -84,6 +105,75 @@ namespace DynamicAtlas
             var newAtlas = new DynamicAtlas();
             mDynamicAtlases.Add(newAtlas);
             return newAtlas;
+        }
+
+        public DynamicAtlas GetDynamicAtlas(int index)
+        {
+            if (index < mDynamicAtlases.Count)
+                return mDynamicAtlases[index];
+
+            // Create atlases to fill up to the requested index
+            while (mDynamicAtlases.Count <= index)
+            {
+                var newAtlas = new DynamicAtlas();
+                mDynamicAtlases.Add(newAtlas);
+            }
+            return mDynamicAtlases[index];
+        }
+
+        public async Task<Sprite> GetSprite(string spriteName, int atlasIndex, CancellationToken token)
+        {
+            spriteName = Path.GetFileNameWithoutExtension(spriteName);
+
+            // Cache hit: sprite already assigned to an atlas
+            if (mSpriteToAtlas.TryGetValue(spriteName, out var cachedAtlas))
+            {
+                return await cachedAtlas.GetSpriteAsync(spriteName, token);
+            }
+
+            // Select target atlas
+            DynamicAtlas targetAtlas;
+            if (atlasIndex == -1)
+                targetAtlas = GetDynamicAtlas();
+            else
+                targetAtlas = GetDynamicAtlas(atlasIndex);
+
+            // Try to load and pack, with retry for overflow
+            const int maxRetries = 3;
+            for (int attempt = 0; attempt < maxRetries; attempt++)
+            {
+                if (token.IsCancellationRequested) return null;
+
+                var result = await targetAtlas.GetSpriteAsync(spriteName, token);
+                if (result != null)
+                {
+                    mSpriteToAtlas[spriteName] = targetAtlas;
+                    return result;
+                }
+
+                // Check if this was an overflow failure
+                var overflowNames = targetAtlas.OverflowTextureNames;
+                if (overflowNames != null && overflowNames.Contains(spriteName))
+                {
+                    // Overflow: try again on a new atlas
+                    targetAtlas = GetDynamicAtlas();
+                    continue;
+                }
+
+                // Load failure or other non-overflow issue
+                return null;
+            }
+
+            return null;
+        }
+
+        public void ReleaseSprite(string spriteName)
+        {
+            if (mSpriteToAtlas.TryGetValue(spriteName, out var atlas))
+            {
+                atlas.RemoveSprite(spriteName);
+                mSpriteToAtlas.Remove(spriteName);
+            }
         }
     }
 }

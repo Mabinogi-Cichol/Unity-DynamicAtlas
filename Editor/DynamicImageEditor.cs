@@ -10,12 +10,17 @@ namespace DynamicAtlas
     public class DynamicImageEditor : ImageEditor
     {
         private string mEditorLoadingSpriteName;
+        private SerializedProperty m_AtlasIndexProp;
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             var dynamicImage = (DynamicImage)target;
             var serializedObject = new SerializedObject(target);
+            m_AtlasIndexProp = serializedObject.FindProperty("mAtlasIndex");
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(m_AtlasIndexProp, new GUIContent("Atlas Index", "-1 = auto allocation; >=0 = manual atlas index"));
+            serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.LabelField("Runtime Debug");
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
