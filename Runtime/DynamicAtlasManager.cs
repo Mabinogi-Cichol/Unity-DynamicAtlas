@@ -167,6 +167,37 @@ namespace DynamicAtlas
             return null;
         }
 
+        /// <summary>
+        /// Directly append an already-loaded Sprite to the appropriate atlas.
+        /// First checks global cache (mSpriteToAtlas) and atlas-local storage;
+        /// if not found, calls atlas.AppendSpriteDirectAsync to append without LoadAssetFunc.
+        /// </summary>
+        public async Task<Sprite> GetOrAppendDirectSprite(Sprite sprite, int atlasIndex, CancellationToken token)
+        {
+            var spriteName = Path.GetFileNameWithoutExtension(sprite.name);
+
+            // Cache hit: sprite already tracked globally
+            if (mSpriteToAtlas.TryGetValue(spriteName, out var cachedAtlas))
+                return await cachedAtlas.GetSpriteAsync(spriteName, token);
+
+            // Select target atlas
+            DynamicAtlas targetAtlas;
+            if (atlasIndex == -1)
+                targetAtlas = GetDynamicAtlas();
+            else
+                targetAtlas = GetDynamicAtlas(atlasIndex);
+
+            // Check if already in target atlas
+            if (targetAtlas.ContainsSprite(spriteName))
+                return await targetAtlas.GetSpriteAsync(spriteName, token);
+
+            // Not found — directly append existing Sprite (skip LoadAssetFunc)
+            var result = await targetAtlas.AppendSpriteDirectAsync(sprite, token);
+            if (result != null)
+                mSpriteToAtlas[spriteName] = targetAtlas;
+            return result;
+        }
+
         public void ReleaseSprite(string spriteName)
         {
             if (mSpriteToAtlas.TryGetValue(spriteName, out var atlas))

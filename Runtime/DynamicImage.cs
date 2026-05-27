@@ -56,7 +56,18 @@ namespace DynamicAtlas
                 }
                 mCancellation = new CancellationTokenSource();
                 var token = mCancellation.Token;
-                SetSpriteAsync(sprite.name, token)/*.Forget()*/;
+                // Directly append Inspector sprite to atlas (skip name-based LoadAssetFunc)
+                SetSpriteFromDefaultSprite(sprite, token)/*.Forget()*/;
+            }
+        }
+
+        private async Task SetSpriteFromDefaultSprite(Sprite defaultSprite, CancellationToken token)
+        {
+            var result = await DynamicAtlasManager.Instance.GetOrAppendDirectSprite(defaultSprite, mAtlasIndex, token);
+            if (token.IsCancellationRequested) return;
+            if (result != null)
+            {
+                this.sprite = result;
             }
         }
 

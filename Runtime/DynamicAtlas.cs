@@ -265,6 +265,40 @@ namespace DynamicAtlas
             return null;
         }
 
+        /// <summary>
+        /// Directly append an already-loaded Sprite to the atlas, skipping LoadAssetAsync.
+        /// Checks if already present (AddReference), otherwise AppendSprite + pack wait + return.
+        /// </summary>
+        public async Task<Sprite> AppendSpriteDirectAsync(Sprite sprite, CancellationToken token)
+        {
+            var sprite_name = Path.GetFileNameWithoutExtension(sprite.name);
+
+            // Already in atlas — just add reference
+            if (mUsingTexture.TryGetValue(sprite_name, out _))
+                return GetSprite(sprite_name);
+
+            // Already stored as single texture
+            if (mSingleTexture.TryGetValue(sprite_name, out var existing))
+                return existing;
+
+            // Not found — append and wait for pack
+            if (!AppendSprite(sprite))
+                return null;
+
+            while (mNeedProcessPack)
+            {
+                await Task.Yield();
+                if (token.IsCancellationRequested) return null;
+            }
+
+            if (mOverflowTextureNames.Contains(sprite_name))
+                return null;
+
+            DynamicAtlasManager.AppendAtlasDone(sprite_name, DynamicAtlasManager.eLoadResult.Success);
+            if (token.IsCancellationRequested) return null;
+            return GetSprite(sprite_name);
+        }
+
         public void RemoveSprite(string sprite_name)
         {
             if (mSingleTexture.ContainsKey(sprite_name))
