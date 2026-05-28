@@ -10,6 +10,27 @@ The rectangle packing algorithm is based on [GitHub - villekoskelaorg/RectangleP
 
 ![01](Image~/01.png)
 
+## Installation
+
+### Via OpenUPM (Recommended)
+
+You can install this package via [OpenUPM](https://openupm.com/packages/com.mabinogi-cichol.dynamicatlas/):
+
+```bash
+openupm add com.mabinogi-cichol.dynamicatlas
+```
+
+### Via Git URL
+
+You can also install via Unity Package Manager using the Git URL:
+
+1. Open **Window > Package Manager** in Unity.
+2. Click the **+** button and select **Add package from git URL**.
+3. Enter the following URL:
+   ```
+   https://github.com/mabinogi-cichol/Unity-DynamicAtlas.git?path=Packages/Unity-DynamicAtlas
+   ```
+
 ## Features
 
 - Atlas texture compression

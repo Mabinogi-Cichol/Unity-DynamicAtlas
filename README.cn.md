@@ -10,6 +10,27 @@ Unity动态图集解决方案
 
 ![01](Image~/01.png)
 
+## 安装
+
+### 通过 OpenUPM（推荐）
+
+你可以通过 [OpenUPM](https://openupm.com/packages/com.mabinogi-cichol.dynamicatlas/) 安装此包：
+
+```bash
+openupm add com.mabinogi-cichol.dynamicatlas
+```
+
+### 通过 Git URL
+
+你也可以通过 Unity Package Manager 使用 Git URL 安装：
+
+1. 在 Unity 中打开 **Window > Package Manager**。
+2. 点击 **+** 按钮，选择 **Add package from git URL**。
+3. 输入以下 URL：
+   ```
+   https://github.com/mabinogi-cichol/Unity-DynamicAtlas.git?path=Packages/Unity-DynamicAtlas
+   ```
+
 ## 实现的特性
 
 - 图集压缩纹理
