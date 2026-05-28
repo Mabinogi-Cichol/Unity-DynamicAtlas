@@ -1,6 +1,6 @@
 {
   "name": "com.mabinogi-cichol.dynamicatlas",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "displayName": "DynamicAtlas",
   "description": "Unity Dynamic Atlas Solution with Texture Compression Support.",
   "repository": {
