@@ -87,9 +87,13 @@ namespace DynamicAtlas
         public bool AppendSprite(Sprite sprite)
         {
             var texture = sprite.texture;
+            if (!SystemInfo.IsFormatSupported(texture.graphicsFormat, UnityEngine.Experimental.Rendering.FormatUsage.Sample))
+            {
+                Debug.LogWarning($"[DyanamicAtlas]: Cuurent Graphic Device:{SystemInfo.graphicsDeviceName}, API: {SystemInfo.graphicsDeviceType} NotSupport Texture Format:{texture.graphicsFormat} ! can not add to dynamic atlas");
+                return false;
+            }
             if (SystemInfo.copyTextureSupport == UnityEngine.Rendering.CopyTextureSupport.None)
             {
-
                 Debug.LogWarning($"[DyanamicAtlas]: Cuurent Graphic Device:{SystemInfo.graphicsDeviceName}, API: {SystemInfo.graphicsDeviceType} NotSupport CopyTexture ! can not add to dynamic atlas");
                 return false;
             }
